@@ -1,0 +1,10 @@
+name: Get Linked Issues
+description: Find the issues linked to a given pull request
+inputs:
+  access-token: "${{ secrets.GITHUB_TOKEN }}"
+outputs:
+  issues:
+    description: "Array of issues returned by Octokit"
+runs:
+  using: "node12"
+  main: "index.js"

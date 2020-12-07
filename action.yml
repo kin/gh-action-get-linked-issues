@@ -10,6 +10,9 @@ outputs:
 runs:
   using: "node12"
   main: "index.js"
+<<<<<<< HEAD
 branding:
   icon: 'link'
   color: 'green'
+=======
+>>>>>>> 60ba7d7... Create action

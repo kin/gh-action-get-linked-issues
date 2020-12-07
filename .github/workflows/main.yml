@@ -18,6 +18,11 @@ jobs:
         with:
           # Required: personal access token with permissions to archive cards
           access-token: "${{ secrets.GITHUB_TOKEN }}"
+<<<<<<< HEAD
+=======
+      - name: Output the issues
+        run: echo "${{ steps.linked-issues.outputs.issues }}"
+>>>>>>> 60ba7d7... Create action
       - name: Move to In Progress
         uses: kin/gh-action-move-issues-to-column@v1.0
         with:

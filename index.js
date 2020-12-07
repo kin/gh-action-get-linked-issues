@@ -10,6 +10,9 @@ try {
   const repo = github.repository;
   const eventTarget = github.event;
   const pullRequest = eventTarget.pull_request;
+
+
+  // testing
   
   function linkedIssueNumbersFor(pullRequest) {
     const body = pullRequest.body;

@@ -1,0 +1,12 @@
+name: Get Linked Issues
+description: Find the issues linked to a given pull request
+inputs:
+  access-token:
+    description: 'Token with permissions to access issue information in repo'
+    required: true
+outputs:
+  issues:
+    description: "Array of issues returned by Octokit"
+runs:
+  using: "node12"
+  main: "index.js"

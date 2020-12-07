@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Get Linked Issues Action
-        uses: kin/gh-action-get-linked-issues@v1.0
+        uses: ./
         id: linked-issues
         with:
           # Required: personal access token with permissions to archive cards

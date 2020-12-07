@@ -9,7 +9,7 @@ try {
   const owner = github.repository_owner;
   const repo = github.repository;
   const eventTarget = github.event;
-  const pr = eventTarget.pull_request;
+  const pullRequest = eventTarget.pull_request;
   
   async function getPullRequest(number) {
     return octokit.pulls.get({
@@ -21,7 +21,8 @@ try {
 
   function linkedIssueNumbersFor(pullRequest) {
     const body = pullRequest.body;
-    const issueNumbers = body.match(/(?:(resolves|fixes)) #\d+/gi).map(item => parseInt(item.replace(/[^0-9]/g, "")));
+    const linkRegexp = /(?:(close|closes|closed|resolve|resolves|resolved|fix|fixes|fixed)) #\d+/gi;
+    const issueNumbers = body.match(linkRegexp).map(item => parseInt(item.replace(/[^0-9]/g, "")));
     return issueNumbers;
   }
 
@@ -35,10 +36,10 @@ try {
 
   const run = async () => {
     try {
-      if (typeof pr === 'undefined') {
+      if (typeof pullRequest === 'undefined') {
 	core.setFailed('Could not detect pull_request or pull_request_target event trigger. Please ensure workflow only uses these triggers with this action');
       } else {
-	const { data: pullRequest } = await getPullRequest(pr.number);
+//	const { data: pullRequest } = await getPullRequest(pr.number);
 	const issueNumbers = linkedIssueNumbersFor(pullRequest);
 	const issuesRaw = await Promise.all(issueNumbers.map(getIssue));
 	const issues = issuesRaw.map(i => i.data);

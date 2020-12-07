@@ -1,0 +1,27 @@
+name: Sync Review Status
+
+on:
+  # Requires the event trigger to be of type pull_request or pull_request_target
+  pull_request_target:
+    types: [review_requested]
+
+jobs:
+  sync-review-status:
+    runs-on: ubuntu-latest
+    name: Get Linked Issues
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get Linked Issues Action
+        uses: ./
+        id: linked-issues
+        with:
+          # Required: personal access token with permissions to archive cards
+          access-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Move to In Progress
+        uses: kin/gh-action-move-issues-to-column@v1.0
+        with:
+          access-token: "${{ secrets.GITHUB_TOKEN }}"
+          project-name: "My Project"
+          target-column: "In Progress"
+          issues: ${{ steps.linked-issues.outputs.issues }}

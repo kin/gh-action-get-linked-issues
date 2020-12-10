@@ -56,6 +56,7 @@ try {
 					     .replace(/\\r/g, "\\r")
 					     .replace(/\\t/g, "\\t")
 					     .replace(/\\b/g, "\\b")
+					     .replace(/'/g, "\\'")
    	                                     .replace(/\\f/g, "\\f");
     
       core.info(`Returning ${issues.length} issues`);
@@ -70,6 +71,8 @@ try {
   };
 
   run();
+
+  
 }
 catch (error) {
   core.setFailed(error.message);

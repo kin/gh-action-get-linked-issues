@@ -54,6 +54,9 @@ try {
    	                                     .replace(/\\f/g, "\\f");
     
       core.info(`Returning ${issues.length} issues`);
+
+
+      
       core.setOutput("issues", escapedIssues);
     }
     catch (error) {

@@ -48,8 +48,22 @@ try {
 					     return issueObject;
 					   });
 
+      const stringifiedIssues = JSON.stringify(issues, undefined, 2);
+      const escapedIssues = stringifiedIssues.replace(/\\n/g, "\\n")
+					     .replace(/\\'/g, "\\'")
+					     .replace(/\\"/g, '\\"')
+					     .replace(/\\&/g, "\\&")
+					     .replace(/\\r/g, "\\r")
+					     .replace(/\\t/g, "\\t")
+					     .replace(/\\b/g, "\\b")
+					     .replace(/'/g, "\\'")
+   	                                     .replace(/\\f/g, "\\f");
+    
       core.info(`Returning ${issues.length} issues`);
-      core.setOutput("issues", JSON.stringify(issues), undefined, 2);
+
+
+      
+      core.setOutput("issues", escapedIssues);
     }
     catch (error) {
       core.info(error);
@@ -57,6 +71,8 @@ try {
   };
 
   run();
+
+  
 }
 catch (error) {
   core.setFailed(error.message);

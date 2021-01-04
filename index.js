@@ -10,15 +10,15 @@ try {
   const repo = payload.repository;
   const repoName = repo.name;
   const ownerName = repo.owner.login;
-  
   const pullRequest = payload.pull_request;
+  const targetIssue = typeof pullRequest === 'undefined' ? payload.issue : pullRequest;
   
-  function linkedIssueNumbersFor(pullRequest) {
-    const body = pullRequest.body;
+  function linkedIssueNumbersFor(targetIssue) {
+    const body = targetIssue.body;
     const linkRegexp = /(?:(close|closes|closed|resolve|resolves|resolved|fix|fixes|fixed)) #\d+/gi;
     const linkMatches = body.match(linkRegexp);
-    const issueNumbers = linkMatches ? linkMatches.map(item => parseInt(item.replace(/[^0-9]/g, ""))) : [];
-    return issueNumbers;
+    const linkedIssueNumbers = linkMatches ? linkMatches.map(item => parseInt(item.replace(/[^0-9]/g, ""))) : [];
+    return linkedIssueNumbers;
   }
 
   async function getIssue(number) {
@@ -31,13 +31,13 @@ try {
 
   const run = async () => {
     try {
-      if (typeof pullRequest === 'undefined') {
-	core.setFailed('Could not detect pull_request or pull_request_target event trigger. Please ensure workflow only uses these triggers with this action');
+      if (typeof targetIssue === 'undefined') {
+	core.setFailed('Event trigger was not of issue or pull request categories. Please ensure workflow only uses these triggers with this action');
 	return;
       }
       
-      const issueNumbers = linkedIssueNumbersFor(pullRequest);
-      const issuesRaw = await Promise.all(issueNumbers.map(getIssue));
+      const linkedIssueNumbers = linkedIssueNumbersFor(targetIssue);
+      const issuesRaw = await Promise.all(linkedIssueNumbers.map(getIssue));
       const issueData = issuesRaw.map(i => i.data);
       const issues = issueData.map(data => { var issueObject = { issue: data };
 					     return issueObject;

@@ -1,0 +1,32 @@
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+name: Move Issues to In Progress
+jobs:
+  Move_Commented_Issue_on_Board:
+    name: In Progress
+    if: startsWith(github.event.comment.body, '/in progress')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get Linked Issues Action
+        uses: ./
+        id: linked-issues
+        with:
+          access-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Move to Ready for QA
+        uses: kin/gh-action-move-issues-to-column@v1.0
+        with:
+          access-token: "${{ secrets.GITHUB_TOKEN }}"
+          project-name: "My Project"
+          target-column: "In progress"
+          issues: ${{ steps.linked-issues.outputs.issues }}
+  always_job:
+    name: Always run job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Alaways run
+        run: echo "This job is used to prevent the workflow to fail when all other jobs are skipped."

@@ -12,19 +12,25 @@ try {
   const ownerName = repo.owner.login;
   const pullRequest = payload.pull_request;
   const targetIssue = typeof pullRequest === 'undefined' ? payload.issue : pullRequest;
-  
-  function linkedIssueNumbersFor(targetIssue) {
-    const body = targetIssue.body;
-    const linkRegexp = /(?:(close|closes|closed|resolve|resolves|resolved|fix|fixes|fixed)) #\d+/gi;
-    const linkMatches = body.match(linkRegexp);
-    const linkedIssueNumbers = linkMatches ? linkMatches.map(item => parseInt(item.replace(/[^0-9]/g, ""))) : [];
-    return linkedIssueNumbers;
+  const linkingKeywords = ["close", "closes", "closed", "resolve", "resolves", "resolved", "fix", "fixes", "fixed"];
+  const linkGroup = `(?:(${linkingKeywords.join('|')}))`;
+
+  function parseLinkedIssues(matchingStrings) {
+    return matchingStrings.map(item => item.split(/\s|#/)).map(thing => thing.filter(item => item.match(new RegExp(`[^${linkGroup}]`, 'i'))).flatMap(item => item.split('/')).reverse());
   }
 
-  async function getIssue(number) {
+  function linkedIssueDataFor(targetIssue) {
+    const body = targetIssue.body;
+    const linkRegexp = new RegExp(`${linkGroup} (?:(\\S+\/\\S+))?#(\\d+)`, "gi");
+    const linkMatches = body.match(linkRegexp);
+    const linkedIssueData = linkMatches ? parseLinkedIssues(linkMatches): [];
+    return linkedIssueData;
+  }
+
+  async function getIssue(number, repo = repoName, owner = ownerName) {
     return octokit.issues.get({
-      owner: ownerName,
-      repo: repoName,
+      owner: owner,
+      repo: repo,
       issue_number: number,
     });
   }
@@ -36,14 +42,17 @@ try {
 	return;
       }
       
-      const linkedIssueNumbers = linkedIssueNumbersFor(targetIssue);
-      const issuesRaw = await Promise.all(linkedIssueNumbers.map(getIssue));
+      const linkedIssueData = linkedIssueDataFor(targetIssue);
+      const issuesRaw = await Promise.all(linkedIssueData.map(issueData => getIssue(...issueData)));
       const issueData = issuesRaw.map(i => i.data);
       const issues = issueData.map(data => { var issueObject = { issue: data };
 					     return issueObject;
 					   });
 
       core.info(`Returning ${issues.length} issues`);
+      console.log('Linked issue data: ', linkedIssueData);
+      console.log('Issue Data: ', issueData);
+      console.log('Returned issues', issues);
       core.setOutput("issues", JSON.stringify(issues), undefined, 2);
     }
     catch (error) {

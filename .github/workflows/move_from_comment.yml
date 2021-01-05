@@ -16,11 +16,11 @@ jobs:
         uses: ./
         id: linked-issues
         with:
-          access-token: "${{ secrets.GITHUB_TOKEN }}"
+          access-token: "${{ secrets.CROSS_REPO_TOKEN }}"
       - name: Move to Ready for QA
         uses: kin/gh-action-move-issues-to-column@v1.0
         with:
-          access-token: "${{ secrets.GITHUB_TOKEN }}"
+          access-token: "${{ secrets.CROSS_REPO_TOKEN }}"
           project-name: "My Project"
           target-column: "In progress"
           issues: ${{ steps.linked-issues.outputs.issues }}
